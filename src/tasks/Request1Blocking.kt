@@ -3,6 +3,11 @@ package tasks
 import contributors.*
 import retrofit2.Response
 
+
+/**
+ * 블로킹 방식은 결과는 정확하게 나오지만
+ * 다른 UI 작업을 막고있기 때문에 사용성이 매우 떨어진다.
+ */
 fun loadContributorsBlocking(service: GitHubService, req: RequestData) : List<User> {
     val repos = service
         .getOrgReposCall(req.org)
