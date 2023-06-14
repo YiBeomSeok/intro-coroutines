@@ -10,8 +10,7 @@ suspend fun loadContributorsSuspend(service: GitHubService, req: RequestData): L
 
     return repos.flatMap { repo ->
         service
-            .getRepoContributorsCall(req.org, repo.name)
-            .execute() // Executes request and blocks the current thread
+            .getRepoContributors(req.org, repo.name)
             .also { logUsers(repo, it) }
             .bodyList()
     }.aggregate()
