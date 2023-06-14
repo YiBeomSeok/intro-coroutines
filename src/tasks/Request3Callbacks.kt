@@ -8,6 +8,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 fun loadContributorsCallbacks(service: GitHubService, req: RequestData, updateResults: (List<User>) -> Unit) {
+    val counter = AtomicInteger(0) // 여러 스레드에서 호출되어도 문제 없도록 Atomic 을 사용한다.
     service.getOrgReposCall(req.org).onResponse { responseRepos ->
         logRepos(req, responseRepos)
         val repos = responseRepos.bodyList()
@@ -17,10 +18,16 @@ fun loadContributorsCallbacks(service: GitHubService, req: RequestData, updateRe
                 logUsers(repo, responseUsers)
                 val users = responseUsers.bodyList()
                 allUsers += users
+                if (counter.incrementAndGet() == repos.size) {
+                    updateResults(allUsers.aggregate())
+                }
             }
         }
         // TODO: Why this code doesn't work? How to fix that?
-        updateResults(allUsers.aggregate())
+        /**
+         * 아래는 전체 contributors 를 모두 가져왔을 때 호출되어야 한다.
+         */
+        // updateResults(allUsers.aggregate())
     }
 }
 
